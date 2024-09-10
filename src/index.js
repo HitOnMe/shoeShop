@@ -1,13 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import RenderList from './sue-shop/renderProduct';
+import Navigation from './sue-shop/navigation';
 import reportWebVitals from './reportWebVitals';
-
+import Cardlist from './sue-shop/cardList';
+import CartOption from './sue-shop/cartOption';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Navigation/>
+    <Cardlist/>
+    <RenderList />
+    
   </React.StrictMode>
 );
 
