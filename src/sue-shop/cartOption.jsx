@@ -1,41 +1,93 @@
 import React, { Component } from 'react';
+import swal from 'sweetalert';
+
+function sweetAlert(props) {
+  swal({
+    title: "Are you sure to buy this product?",
+    text: "Once confirmed, this product will be added to your cart!",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  })
+  .then((willBuy) => {
+    if (willBuy) {
+      props(); // Custom function to handle adding the product
+      swal("This product is added to your cart", {
+        icon: "success",
+      });
+    } else {
+      swal("You canceled the purchase!", {
+        icon: "info",
+      });
+    }
+  });
+}
 
 export default class CartOption extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      quantity: 1, // Initialize quantity state
+      totalPrice: props.shoe.price // Initialize totalPrice state
+    };
     
-    // Tạo refs cho các phần tử DOM
+    // Create refs for DOM elements
     this.decreaseBtnRef = React.createRef();
     this.increaseBtnRef = React.createRef();
     this.quantityInputRef = React.createRef();
   }
 
-  // Hàm giảm số lượng
+  // Function to calculate the total price
+  calculateTotalPrice = () => {
+    return (this.state.quantity * this.props.shoe.price).toFixed(2);
+  };
+
+  // Decrease quantity
   decrease = () => {
-    let currentValue = parseInt(this.quantityInputRef.current.value);
-    if (currentValue > 1) {
-      this.quantityInputRef.current.value = currentValue - 1;
-    }
+    this.setState((prevState) => {
+      if (prevState.quantity > 1) {
+        const newQuantity = prevState.quantity - 1;
+        return {
+          quantity: newQuantity,
+          totalPrice: (newQuantity * this.props.shoe.price).toFixed(2)
+        };
+      }
+      return null;
+    });
   };
 
-  // Hàm tăng số lượng
+  // Increase quantity
   increase = () => {
-    let currentValue = parseInt(this.quantityInputRef.current.value);
-    this.quantityInputRef.current.value = currentValue + 1;
+    this.setState((prevState) => {
+      const newQuantity = prevState.quantity + 1;
+      return {
+        quantity: newQuantity,
+        totalPrice: (newQuantity * this.props.shoe.price).toFixed(2)
+      };
+    });
   };
 
-  // Hàm kiểm tra chỉ cho phép nhập số
+  // Handle quantity change
   handleQuantityChange = (e) => {
     const value = e.target.value;
-
-    // Kiểm tra nếu giá trị là số hoặc chuỗi rỗng
     if (/^\d*$/.test(value)) {
-      this.quantityInputRef.current.value = value;
+      this.setState({
+        quantity: parseInt(value, 10),
+        totalPrice: (parseInt(value, 10) * this.props.shoe.price).toFixed(2)
+      });
     }
   };
-  
+
+  // Handle add to cart action
+  renderList = () => {
+    sweetAlert(() => {
+      this.props.buyOption({ ...this.props.shoe, quantity: this.state.quantity });
+    });
+  };
+
   render() {
-    const {shoe} = this.props;
+    const { shoe } = this.props;
     return (
       <div
         className="modal fade"
@@ -73,35 +125,35 @@ export default class CartOption extends Component {
                     <span>Số lượng:</span>
                    
                     <div className="input-group ms-3" style={{ width: 120 }}>
-                      {/* Nút giảm */}
+                      {/* Decrease button */}
                       <button
                         className="btn btn-outline-secondary"
                         type="button"
                         ref={this.decreaseBtnRef}
-                        onClick={this.decrease} // Gắn hàm giảm số lượng
+                        onClick={this.decrease}
                       >
                         -
                       </button>
-                      {/* Input số lượng */}
+                      {/* Quantity input */}
                       <input
                         type="text"
                         className="form-control text-center"
                         ref={this.quantityInputRef}
-                        defaultValue={1}
-                        onChange={this.handleQuantityChange} // Gắn hàm kiểm tra chỉ nhập số
+                        value={this.state.quantity}
+                        onChange={this.handleQuantityChange}
                       />
-                      {/* Nút tăng */}
+                      {/* Increase button */}
                       <button
                         className="btn btn-outline-secondary"
                         type="button"
                         ref={this.increaseBtnRef}
-                        onClick={this.increase} // Gắn hàm tăng số lượng
+                        onClick={this.increase}
                       >
                         +
                       </button>
                     </div>
                   </div>
-                  <div>Tổng giá: <strong>{shoe.price}$</strong></div>
+                  <div>Tổng giá: <strong>{this.state.totalPrice}$</strong></div>
                 </div>
               </div>
             </div>
@@ -113,7 +165,7 @@ export default class CartOption extends Component {
               >
                 Đóng
               </button>
-              <button type="button" className="btn btn-primary">
+              <button type="button" className="btn btn-primary" onClick={this.renderList}>
                 Thêm vào giỏ hàng
               </button>
             </div>
