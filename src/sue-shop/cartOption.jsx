@@ -15,6 +15,7 @@ function sweetAlert(props) {
       swal("This product is added to your cart", {
         icon: "success",
       });
+      
     } else {
       swal("You canceled the purchase!", {
         icon: "info",
@@ -36,6 +37,16 @@ export default class CartOption extends Component {
     this.decreaseBtnRef = React.createRef();
     this.increaseBtnRef = React.createRef();
     this.quantityInputRef = React.createRef();
+  }
+
+  componentDidUpdate(prevProps) {
+    // Check if props.shoe has changed
+    if (prevProps.shoe !== this.props.shoe) {
+      this.setState({
+        quantity: 1, // Reset quantity
+        totalPrice: this.props.shoe.price // Reset totalPrice
+      });
+    }
   }
 
   // Function to calculate the total price
@@ -153,7 +164,7 @@ export default class CartOption extends Component {
                       </button>
                     </div>
                   </div>
-                  <div>Tổng giá: <strong>{this.state.totalPrice}$</strong></div>
+                  <div>Tổng giá: <strong>{this.calculateTotalPrice()}$</strong></div>
                 </div>
               </div>
             </div>

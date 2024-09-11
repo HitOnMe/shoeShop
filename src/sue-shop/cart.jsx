@@ -10,7 +10,9 @@ export default class Cart extends Component {
             <td><img src={product.image} style={{ width: 100 }} alt={product.name} /></td>
             <td>{product.price}</td>
             <td>{product.quantity}</td>
-            <td><button className='btn btn-danger'>Delete</button></td>
+            <td>
+              <button className='btn btn-danger' onClick={() => this.props.delete(index)}>Delete</button>
+            </td>
           </tr>
         );
       })
